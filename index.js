@@ -6,9 +6,12 @@
 const schedule = require('node-schedule');
 const exec = require('child_process').exec;
 
+const dayjs = require('dayjs');
+
 // 每隔30分钟执行一次
 const j2 = schedule.scheduleJob('*/30 * * * *', function () {
-	console.log('执行单元测试中 ...');
+    const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
+	console.log(`${now} 执行单元测试中 ...`);
 
 	// exec 执行命令
 	exec('npm run test', function (err, stdout, stderr) {

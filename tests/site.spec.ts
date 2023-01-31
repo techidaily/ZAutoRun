@@ -18,14 +18,6 @@ import {
 // 使用代理IP访问https://www.baidu.com/
 // 如果返回的页面包含“百度一下，你就知道”，则代理IP可用
 
-// 代理IP地址列表
-const proxyList: string[] = [];
-
-// 有效的代理IP地址列表
-const validProxyList: string[] = [];
-
-// 声明能够访问YouTube的代理IP地址列表
-const youtubeProxyList: string[] = [];
 
 const viewPortSize = getRandomBrowserResolution();
 /* 地理位置信息 */
@@ -48,7 +40,8 @@ console.log('commonUseOptions: ', commonUseOptions);
 test.describe.configure({ mode: 'serial', timeout: 60 * 1000 * 60 });
 
 test.describe('使用代理IP访问站点', () => {
-	test.skip('验证当前的IP及地理信息', async () => {
+  test.skip('验证当前的IP及地理信息', async () => {
+    let browserSuccess = false;
 		let browser;
 		try {
 			browser = await chromium.launch({
@@ -75,14 +68,19 @@ test.describe('使用代理IP访问站点', () => {
 
 			// 静默等待5秒
 			await page.waitForTimeout(5 * 1000);
+
+      browserSuccess = true;
 		} catch (error) {
 			console.log(error);
 		} finally {
 			await browser.close();
 		}
+
+    expect(browserSuccess).toBe(true);
 	});
 
-	test('测试能访问Youtube', async () => {
+  test('测试能访问Youtube', async () => {
+    let browserSuccess = false;
 		let browser;
 		try {
 			browser = await chromium.launch({
@@ -108,15 +106,20 @@ test.describe('使用代理IP访问站点', () => {
 			await expect(page).toHaveURL(url);
 
 			// 静默等待5秒
-			await page.waitForTimeout(_.random(10000, 20000));
+      await page.waitForTimeout(_.random(10000, 20000));
+
+      browserSuccess = true;
 		} catch (error) {
-			// console.log(error);
+			console.log(error);
 		} finally {
 			await browser.close();
 		}
+
+    expect(browserSuccess).toBeTruthy();
 	});
 
-	test('执行访问官网网址', async () => {
+  test('执行访问官网网址', async () => {
+    let browserSuccess = false;
 		let browser;
 		try {
 			browser = await chromium.launch({
@@ -146,12 +149,16 @@ test.describe('使用代理IP访问站点', () => {
 
 			// 静默等待5秒
 			await page.waitForTimeout(_.random(15000, 30000));
-			await runUIActionForSite(page);
+      await runUIActionForSite(page);
+
+      browserSuccess = true;
 		} catch (error) {
 			console.log(error);
 		} finally {
 			await browser.close();
 		}
+
+    expect(browserSuccess).toBeTruthy();
 	});
 });
 
