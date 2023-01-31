@@ -16,15 +16,15 @@ export async function clickOneAds(visibleFrameList: any[]) {
 			} catch (error) {
 				// 容错处理，如果该frame没有frameElement，则不进行滚动
 				continue;
-			 }
+			}
 
 			// 使用
 			// 查找iframe 中的内部 div 元素带有属性data-google-av-adk，该元素是广告元素
 			const adElementList = await frame.locator('div[data-google-av-adk]').all();
-	
+
 			// 随机选择一个广告元素
 			const adElement = _.sample(adElementList);
-	
+
 			// 点击该广告元素
 			await adElement.click();
 
@@ -32,8 +32,6 @@ export async function clickOneAds(visibleFrameList: any[]) {
 			break;
 		} catch (error) {}
 	}
-
-
 
 	return clickSuccess;
 }

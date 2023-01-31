@@ -32,7 +32,7 @@ console.log('commonUseOptions: ', commonUseOptions);
 test.describe.configure({ mode: 'serial', timeout: 60 * 1000 * 60 });
 
 test.describe('debug', () => {
-	test('click iframe', async ({ page }) => {
+	test.skip('click iframe', async ({ page }) => {
 		// 打开一个网站
 		await page.goto('https://techidaily.com', {
 			waitUntil: 'domcontentloaded',

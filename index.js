@@ -16,7 +16,7 @@ const j2 = schedule.scheduleJob('*/20 * * * *', function () {
 	console.log(`${startTime} 执行单元测试中 ...`);
 
 	// exec 执行命令
-	exec('npm run test:site', function (err, stdout, stderr) {
+	exec('npm run test', function (err, stdout, stderr) {
 		if (err) {
 			console.log(err);
 		} else {
