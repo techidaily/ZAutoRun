@@ -166,8 +166,8 @@ function getOneSiteUrl() {
 
 async function runUIActionForSite(page: any) {
 	// 定义整体操作用时，最小，最大的区间
-	const minTotalTime = 5 * 60 * 1000;
-	const maxTotalTime = 12 * 60 * 1000;
+	const minTotalTime = 8 * 60 * 1000;
+	const maxTotalTime = 20 * 60 * 1000;
 
 	// 生成随机整体操作用时，最小，最大的区间
 	const totalTime = _.random(minTotalTime, maxTotalTime);
