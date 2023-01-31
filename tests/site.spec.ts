@@ -3,21 +3,13 @@ import _ from 'lodash';
 import fs from 'node:fs';
 import { join } from 'node:path';
 import {
+	clickOneAds,
 	getChromeUserAgent,
 	getRandomBestGeoInfo,
 	getRandomBrowserResolution,
+	getVisibleFrames,
 	logUtil
 } from '../util';
-
-// 去国外代理IP网站，获取最新的代理IP地址列表
-// https://www.kuaidaili.com/free/inha/1/
-// 测试代理IP是否可用
-// 使用代理IP访问https://httpbin.org/ip
-// 如果返回的IP地址与代理IP地址相同，则代理IP可用
-// 如果返回的IP地址与代理IP地址不同，则代理IP不可用
-// 使用代理IP访问https://www.baidu.com/
-// 如果返回的页面包含“百度一下，你就知道”，则代理IP可用
-
 
 const viewPortSize = getRandomBrowserResolution();
 /* 地理位置信息 */
@@ -40,8 +32,8 @@ console.log('commonUseOptions: ', commonUseOptions);
 test.describe.configure({ mode: 'serial', timeout: 60 * 1000 * 60 });
 
 test.describe('使用代理IP访问站点', () => {
-  test.skip('验证当前的IP及地理信息', async () => {
-    let browserSuccess = false;
+	test.skip('验证当前的IP及地理信息', async () => {
+		let browserSuccess = false;
 		let browser;
 		try {
 			browser = await chromium.launch({
@@ -69,18 +61,18 @@ test.describe('使用代理IP访问站点', () => {
 			// 静默等待5秒
 			await page.waitForTimeout(5 * 1000);
 
-      browserSuccess = true;
+			browserSuccess = true;
 		} catch (error) {
 			console.log(error);
 		} finally {
 			await browser.close();
 		}
 
-    expect(browserSuccess).toBe(true);
+		expect(browserSuccess).toBe(true);
 	});
 
-  test('测试能访问Youtube', async () => {
-    let browserSuccess = false;
+	test('测试能访问Youtube', async () => {
+		let browserSuccess = false;
 		let browser;
 		try {
 			browser = await chromium.launch({
@@ -106,20 +98,20 @@ test.describe('使用代理IP访问站点', () => {
 			await expect(page).toHaveURL(url);
 
 			// 静默等待5秒
-      await page.waitForTimeout(_.random(10000, 20000));
+			await page.waitForTimeout(_.random(10000, 20000));
 
-      browserSuccess = true;
+			browserSuccess = true;
 		} catch (error) {
 			console.log(error);
 		} finally {
 			await browser.close();
 		}
 
-    expect(browserSuccess).toBeTruthy();
+		expect(browserSuccess).toBeTruthy();
 	});
 
-  test('执行访问官网网址', async () => {
-    let browserSuccess = false;
+	test('执行访问官网网址', async () => {
+		let browserSuccess = false;
 		let browser;
 		try {
 			browser = await chromium.launch({
@@ -143,22 +135,25 @@ test.describe('使用代理IP访问站点', () => {
 			expect(url).toBeTruthy();
 
 			console.log(`使用代理IP访问：${url}`);
-			await page.goto(url);
+			await page.goto(url, {
+				waitUntil: 'domcontentloaded',
+				timeout: 60 * 1000
+			});
 			await page.waitForURL(url);
 			await expect(page).toHaveURL(url);
 
 			// 静默等待5秒
 			await page.waitForTimeout(_.random(15000, 30000));
-      await runUIActionForSite(page);
+			await runUIActionForSite(page);
 
-      browserSuccess = true;
+			browserSuccess = true;
 		} catch (error) {
 			console.log(error);
 		} finally {
 			await browser.close();
 		}
 
-    expect(browserSuccess).toBeTruthy();
+		expect(browserSuccess).toBeTruthy();
 	});
 });
 
@@ -171,10 +166,13 @@ function getOneSiteUrl() {
 	return site;
 }
 
-async function runUIActionForSite(page: any) {
+async function runUIActionForSite(page: any, options = {
+	minTotalTime: 3 * 60 * 1000,
+	maxTotalTime: 8 * 60 * 1000,
+}) {
 	// 定义整体操作用时，最小，最大的区间
-	const minTotalTime = 8 * 60 * 1000;
-	const maxTotalTime = 20 * 60 * 1000;
+	const minTotalTime = options.minTotalTime;
+	const maxTotalTime = options.maxTotalTime;
 
 	// 生成随机整体操作用时，最小，最大的区间
 	const totalTime = _.random(minTotalTime, maxTotalTime);
@@ -271,7 +269,6 @@ async function runUIActionForSite(page: any) {
 			preRuFinishedTime = lastRunFinishedTime;
 
 			const selfHostLinks: any[] = []; // 站内链接
-			const otherHostLinks: any[] = []; // 站外链接
 
 			// 获得页面中所有的链接
 			const links = await page.getByRole('link').all();
@@ -299,9 +296,6 @@ async function runUIActionForSite(page: any) {
 				}
 			}
 
-			// 广告嵌入在iframe中，需要识别页面中是否有iframe，如果有，则需要点击iframe中的链接
-			otherHostLinks.push(...(await detectAdsFrames(page)));
-
 			// 声明一个变量，用来判断耗时已经超过了
 			const progressPer = _.random(0.85, 0.95, true);
 			const enableClick = new Date().getTime() - startTime >= (totalTime - startTime) * progressPer;
@@ -310,12 +304,22 @@ async function runUIActionForSite(page: any) {
 			if (enableClick) {
 				console.log(`耗时已经过${progressPer}，自动执行点击操作`);
 				// 随机Boolean值，如果为true，则点击站内链接，否则点击站外链接
-				const enableClickAds = _.random(1, 15) > 3;
-				const clickedFrame =
-					enableClickAds &&
-					otherHostLinks.length > 0 &&
-					(await tryClickAdsFrame(page, otherHostLinks));
-				if (!clickedFrame) {
+				const enableClickAds = _.random(1, 7) > 3;
+				const clickedAds = enableClickAds && (await tryClickAdsFrame(page));
+				if (clickedAds) {
+					// 获得Context上下文，最新的页面
+					const context = await page.context();
+					const pages = await context.pages();
+					const lastPage = _.last(pages);
+					if (lastPage) {
+						// 等待5秒
+						try {
+							await runUIActionForSite(lastPage);
+						} catch (err) {
+							console.error(err);
+						}
+					}
+				} else {
 					// 随机选择一个链接，进行点击
 					await tryClickSelfHostList(selfHostLinks, page);
 				}
@@ -330,24 +334,8 @@ async function runUIActionForSite(page: any) {
 }
 
 async function detectAdsFrames(page: any) {
-	const frameList: any[] = [];
-	const iframes = await page.frames();
-	for (let i = 0; i < iframes.length; i += 1) {
-		const iframe = iframes[i];
-		const url = iframe.url();
-
-		// 过滤类似于https://googleads.g.doubleclick.net/pagead/html/r20230124/r20110914/zrt_lookup.html?fsb=1#RS-0-&adk=1812271808&client=ca-pub-7571918770474297&fa=8&ifi=9&uci=a!9&xpc=UT4z2tI0iJ&p=https%3A//techidaily.com， 字符串长度要大于100，将iframe中的链接进行保存
-		if (_.isString(url) && url) {
-			const found = url.match(/(https?:\/\/)?(www\.)?googleads\.g\.doubleclick\.net\/[a-z0-9-]+/);
-			if (found && found.length > 0 && url.length > 300) {
-				// 输出日志
-				logUtil.debug(`找到iframe：${url}`);
-				frameList.push(iframe);
-			}
-		}
-	}
-
-	return frameList;
+	const frames = await getVisibleFrames(page);
+	return frames;
 }
 
 async function tryClickSelfHostList(selfHostLinks: any[], page: any) {
@@ -356,69 +344,19 @@ async function tryClickSelfHostList(selfHostLinks: any[], page: any) {
 		await link.scrollIntoViewIfNeeded();
 
 		const href = await link.evaluate((node) => node.href);
-		console.log(`点击链接：${href}`);
+		console.log(`点击了站内链接：${href}`);
 
 		await link.click();
 		await page.waitForTimeout(_.random(5, 20) * 1000);
 	}
 }
 
-async function tryClickAdsFrame(page: any, otherHostLinks: any[]) {
-	const scrollHeight = await page.evaluate(
-		() => document.documentElement.scrollHeight || document.body.scrollHeight
-	);
-	const clientHeight = await page.evaluate(
-		() => document.documentElement.clientHeight || document.body.clientHeight
-	);
-	const clientWidth = await page.evaluate(
-		() => document.documentElement.clientWidth || document.body.clientWidth
-	);
-	const scrollTop = await page.evaluate(
-		() => document.documentElement.scrollTop || document.body.scrollTop
-	);
+async function tryClickAdsFrame(page) {
+	const frames = await getVisibleFrames(page);
+	console.log(`检测到${frames.length}个广告框架`);
 
-	// 声明一个变量，用来记录可视的iframe数组
-	const visibleFrames: any[] = [];
+	const clicked = await clickOneAds(frames);
+	console.log(`点击广告框架：${clicked}`);
 
-	// 先检测哪些外部链接的iframe，在可视区域内，如果有，则点击
-	for (let i = 0; i < otherHostLinks.length; i += 1) {
-		const iframe = otherHostLinks[i];
-		const frameElement = await iframe.frameElement();
-		const box = await frameElement.boundingBox();
-		if (box === null) continue;
-
-		if (box.y > 0 && box.y < clientHeight && box.x > 0 && box.x < clientWidth) {
-			visibleFrames.push(iframe);
-		}
-	}
-
-	// 随机选择一个可见的iframe，进行点击
-	if (visibleFrames.length > 0) {
-		const iframe = _.sample(visibleFrames);
-
-		// 获得iframe所在的坐标，及尺寸
-		const frameElement = await iframe.frameElement();
-
-		// 将iframe滚动到可见区域
-		await frameElement.scrollIntoViewIfNeeded();
-
-		// 获得iframe所在的区域
-		const box = await frameElement.boundingBox();
-
-		// 将鼠标定位到iframe中
-		await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-
-		// 在iframe所在的区域，随机选择一个位置，进行点击
-		const x = _.random(box.x, box.x + box.width);
-		const y = _.random(box.y, box.y + box.height);
-		await page.mouse.click(x, y);
-
-		console.log(`点击广告iframe ...`);
-
-		await page.waitForTimeout(_.random(15000, 30000));
-
-		return true;
-	}
-
-	return false;
+	return clicked;
 }
