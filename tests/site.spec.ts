@@ -333,11 +333,6 @@ async function runUIActionForSite(page: any, options = {
 	await page.waitForTimeout(1000 * 10);
 }
 
-async function detectAdsFrames(page: any) {
-	const frames = await getVisibleFrames(page);
-	return frames;
-}
-
 async function tryClickSelfHostList(selfHostLinks: any[], page: any) {
 	if (selfHostLinks.length > 0) {
 		const link = _.sample(selfHostLinks);
@@ -352,6 +347,8 @@ async function tryClickSelfHostList(selfHostLinks: any[], page: any) {
 }
 
 async function tryClickAdsFrame(page) {
+	// 页面需要等待20 - 30秒，才能检测到广告框架
+	await page.waitForTimeout(_.random(20, 30) * 1000);
 	const frames = await getVisibleFrames(page);
 	console.log(`检测到${frames.length}个广告框架`);
 

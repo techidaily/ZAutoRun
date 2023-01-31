@@ -10,7 +10,7 @@ export async function clickOneAds(visibleFrameList: any[]) {
 			const frameElement = await frame.frameElement();
 			await frameElement.scrollIntoViewIfNeeded();
 		} catch (error) { }
-	
+
 		// 使用
 		// 查找iframe 中的内部 div 元素带有属性data-google-av-adk，该元素是广告元素
 		const adElementList = await frame.locator('div[data-google-av-adk]').all();
