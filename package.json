@@ -2,14 +2,23 @@
   "name": "AutoRuns",
   "version": "1.0.0",
   "description": "",
+  "main": "index.js",
   "scripts": {
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:site": "playwright test \"site.spec.ts\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "node-schedule": "^2.1.1"
+  },
   "devDependencies": {
     "@playwright/test": "^1.30.0",
-    "@types/node": "^18.11.18"
+    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
+    "@types/lodash": "^4.14.191",
+    "@types/node": "^18.11.18",
+    "prettier": "^2.8.3"
   }
 }
