@@ -302,11 +302,11 @@ async function runUIActionForSite(page: any) {
 			// 广告嵌入在iframe中，需要识别页面中是否有iframe，如果有，则需要点击iframe中的链接
 			otherHostLinks.push(...(await detectAdsFrames(page)));
 
-			// 声明一个变量，用来判断耗时已经超过了四分之三
-			const progressPer = 0.85;
+			// 声明一个变量，用来判断耗时已经超过了
+			const progressPer = _.random(0.85, 0.95, true);
 			const enableClick = new Date().getTime() - startTime >= (totalTime - startTime) * progressPer;
 
-			// 判断耗时是否已经过四分之三，如果是，则退出
+			// 判断耗时是否已经过了设置的时间，如果是，则执行点击操作
 			if (enableClick) {
 				console.log(`耗时已经过${progressPer}，自动执行点击操作`);
 				// 随机Boolean值，如果为true，则点击站内链接，否则点击站外链接
