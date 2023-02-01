@@ -191,14 +191,14 @@ async function runUIActionForSite(
 	// 当整体操作耗时小于10分钟时，执行随机操作
 	while (lastRunFinishedTime - startTime < totalTime) {
 		console.log(
-			`正在执行UI中 .... ${actionSpec}已耗时：${Math.floor((lastRunFinishedTime - startTime) / 1000 / 60)} 分钟`
+			`正在执行UI中 .... ${actionSpec}已耗时：${(lastRunFinishedTime - startTime) / 1000 } 秒`
 		);
 
 		// 声明最大的随机间隔秒数
-		const maxRandomIntervalSecs = 2;
+		const maxRandomIntervalSecs = 5;
 
 		// 声明随机UI操作最大次数
-		const maxRandomActionCount = 8;
+		const maxRandomActionCount = 15;
 
 		// 随机执行UI操作
 		const actionCount = _.random(1, maxRandomActionCount);
@@ -305,7 +305,7 @@ async function runUIActionForSite(
 
 			// 判断耗时是否已经过了设置的时间，如果是，则执行点击操作
 			if (enableClick) {
-				console.log(`耗时已经过${progressPer}，自动执行点击操作`);
+				console.log(`耗时已经过${_.ceil(progressPer) * 100}%，自动执行点击操作`);
 				// 随机Boolean值，如果为true，则点击站内链接，否则点击站外链接
 				const enableClickAds = _.random(1, 7) > 3;
 				const clickedAds = enableClickAds && (await tryClickAdsFrame(page));
