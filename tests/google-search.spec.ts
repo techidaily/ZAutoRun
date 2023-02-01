@@ -48,15 +48,22 @@ test.describe('使用代理IP访问站点', () => {
 		});
   });
 
-  test('测试通过Google搜索进入站点页面', async () => {
-    await test.step('打开Google', async () => { });
-    await test.step('搜索关键字', async () => { });
-    await test.step('验证搜索结果', async () => { });
-    await test.step('查找复合要求的搜索结果', async () => { });
-    await test.step('点击搜索结果', async () => { });
-    await test.step('验证页面', async () => { });
-    await test.step('页面内操作', async () => { });
-    await test.step('关闭页面', async () => { });
-    await test.step('关闭浏览器', async () => { });
+	test('测试通过Google搜索进入站点页面', async () => {
+		let browser;
+		try {
+			await test.step('打开Google', async () => { });
+			await test.step('搜索关键字', async () => { });
+			await test.step('验证搜索结果', async () => { });
+			await test.step('查找复合要求的搜索结果', async () => { });
+			await test.step('点击搜索结果', async () => { });
+			await test.step('验证页面', async () => { });
+			await test.step('页面内操作', async () => { });
+		} catch (error) {
+			throw error;
+		} finally {
+			if (browser) {
+				await browser.close();
+			}
+		}
   });
 });

@@ -1,5 +1,5 @@
 export const logUtil = {
-  logMouseMove: (...args) => console.log(...args),
+  logMouseMove: (...args) => 0 && console.log(...args),
   logMouseClick: (...args) => console.log(...args),
   logMouseDrag: (...args) => console.log(...args),
   logMouseDrop: (...args) => console.log(...args),
@@ -9,6 +9,6 @@ export const logUtil = {
   logMouseOut: (...args) => console.log(...args),
   logMouseUp: (...args) => console.log( ...args),
   logMouseDown: (...args) => console.log(...args),
-  logMouseWheel: (...args) => console.log(...args),
-  debug: (...args) => console.log(...args),
+  logMouseWheel: (...args) => 0 && console.log(...args),
+  debug: (...args) => 0 && console.log(...args),
 }

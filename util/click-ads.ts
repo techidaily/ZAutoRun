@@ -4,10 +4,10 @@ export async function clickOneAds(visibleFrameList: any[]) {
 	let clickSuccess = false;
 
 	// 对数组进行随机乱序排序
-	visibleFrameList = _.shuffle(visibleFrameList);
+	const shuffleFrameList = _.shuffle(visibleFrameList);
 
 	// 循环点击广告
-	for await (const frame of visibleFrameList) {
+	for await (const frame of shuffleFrameList) {
 		try {
 			// 有必要的话，滚动到该iframe的位置
 			try {
@@ -32,7 +32,8 @@ export async function clickOneAds(visibleFrameList: any[]) {
 			}
 
 			// 根据数组长度和当前时间戳，编写一个随机选择一个数组元素的算法
-			const adElement = _.sample(_.shuffle(adElementList));
+			const shuffleFrameList = _.shuffle(adElementList);
+			const adElement = _.sample(shuffleFrameList);
 			const randomIndex = adElementList.indexOf(adElement);
 			console.log(`随机选择的广告元素Index是: ${randomIndex}`);
 
