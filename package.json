@@ -2,7 +2,7 @@
   "name": "AutoRuns",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "auto.js",
   "scripts": {
     "auto": "node ./auto.js",
     "test": "playwright test",
@@ -13,8 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "dayjs": "^1.11.7",
-    "lodash": "^4.17.21",
-    "node-schedule": "^2.1.1"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@playwright/test": "^1.30.0",
