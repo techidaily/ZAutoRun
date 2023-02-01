@@ -313,13 +313,17 @@ async function runUIActionForSite(
 
 					console.log(`当前页面数量：${pages.length}`);
 
-					const lastPage = _.last(pages);
-					if (lastPage) {
-						// 等待5秒
-						try {
-							await runUIActionForSite(lastPage);
-						} catch (err) {
-							console.error(err);
+					// 是否对最后一个页面进行操作
+					// 暂时不对最后一个页面进行操作
+					if (0) {
+						const lastPage = _.last(pages);
+						if (lastPage) {
+							// 等待5秒
+							try {
+								await runUIActionForSite(lastPage);
+							} catch (err) {
+								console.error(err);
+							}
 						}
 					}
 				} else {
