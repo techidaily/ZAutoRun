@@ -21,9 +21,16 @@ export async function clickOneAds(visibleFrameList: any[]) {
 			// 使用
 			// 查找iframe 中的内部 div 元素带有属性data-google-av-adk，该元素是广告元素
 			const adElementList = await frame.locator('div[data-google-av-adk]').all();
+			console.log(`广告元素有: ${adElementList.length} 个`);
 
-			// 随机选择一个广告元素
-			const adElement = _.sample(adElementList);
+			if (adElementList.length === 0) {
+				continue;
+			}
+
+			// 根据数组长度和当前时间戳，编写一个随机选择一个数组元素的算法
+			const randomIndex = new Date().getTime() % adElementList.length;
+			const adElement = adElementList[randomIndex];
+			console.log(`随机选择的广告元素Index是: ${randomIndex}`);
 
 			// 点击该广告元素
 			await adElement.click();

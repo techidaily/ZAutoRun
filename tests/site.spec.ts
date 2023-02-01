@@ -3,6 +3,7 @@ import _ from 'lodash';
 import fs from 'node:fs';
 import { join } from 'node:path';
 import {
+	checkVisitYoutube,
 	clickOneAds,
 	getChromeUserAgent,
 	getRandomBestGeoInfo,
@@ -74,42 +75,12 @@ test.describe('使用代理IP访问站点', () => {
 	});
 
 	test('测试能访问Youtube', async () => {
-		let browserSuccess = false;
-		let browser;
-		try {
-			browser = await chromium.launch({
-				headless: disableHeadless,
-				proxy: {
-					server: 'per-context'
-				}
-			});
-
-			const context = await browser.newContext({
-				proxy: {
-					server: proxyServer
-				},
-				...commonUseOptions
-			});
-
-			const url = 'https://www.youtube.com/';
-
-			const page = await context.newPage();
-			await page.setViewportSize(viewPortSize);
-			await page.goto(url);
-			await page.waitForURL(url);
-			await expect(page).toHaveURL(url);
-
-			// 静默等待5秒
-			await page.waitForTimeout(_.random(10000, 20000));
-
-			browserSuccess = true;
-		} catch (error) {
-			console.log(error);
-		} finally {
-			await browser.close();
-		}
-
-		expect(browserSuccess).toBeTruthy();
+		await checkVisitYoutube({
+			proxyServer: proxyServer,
+			commonUseOptions: commonUseOptions,
+			disableHeadless: disableHeadless,
+			viewPortSize: viewPortSize
+		});
 	});
 
 	test('执行访问官网网址', async () => {
@@ -159,6 +130,7 @@ test.describe('使用代理IP访问站点', () => {
 	});
 });
 
+
 function getOnePostUrl() {
 	// 读取网址列表
 	const siteList = fs.readFileSync(join(__dirname, 'data/posts.txt'), 'utf8').split('\n');
@@ -168,10 +140,13 @@ function getOnePostUrl() {
 	// 从配置文件data/config.cache,读取访问的网址索引，如果没有该文件就创建
 	// 判断文件是否存在，不存在，就创建
 	if (!fs.existsSync(configFile)) {
-		fs.writeFileSync(configFile, JSON.stringify({
-			postIndex: 0,
-			siteIndex: 0,
-		}));
+		fs.writeFileSync(
+			configFile,
+			JSON.stringify({
+				postIndex: 0,
+				siteIndex: 0
+			})
+		);
 	}
 
 	// dump
@@ -190,10 +165,13 @@ function getOnePostUrl() {
 	return site;
 }
 
-async function runUIActionForSite(page: any, options = {
-	minTotalTime: 3 * 60 * 1000,
-	maxTotalTime: 8 * 60 * 1000,
-}) {
+async function runUIActionForSite(
+	page: any,
+	options = {
+		minTotalTime: 3 * 60 * 1000,
+		maxTotalTime: 8 * 60 * 1000
+	}
+) {
 	// 定义整体操作用时，最小，最大的区间
 	const minTotalTime = options.minTotalTime;
 	const maxTotalTime = options.maxTotalTime;
@@ -334,6 +312,9 @@ async function runUIActionForSite(page: any, options = {
 					// 获得Context上下文，最新的页面
 					const context = await page.context();
 					const pages = await context.pages();
+
+					console.log(`当前页面数量：${pages.length}`);
+
 					const lastPage = _.last(pages);
 					if (lastPage) {
 						// 等待5秒
