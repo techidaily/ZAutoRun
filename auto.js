@@ -22,14 +22,10 @@ function run() {
 		console.log(`${endTime} 本次单元测试已经完成 ... 花费时间: ${diff} 秒`);
 
     // 让Node进程休眠 30 秒
-    process.stdout.write('等待 30 秒后，再执行下一个脚本');
-    for (let i = 0; i < 30; i++) {
-      process.stdout.write('.');
-      sleep(1000);
-    }
-
-    process.stdout.write('开始执行下一个脚本');
-    run();
+    setTimeout(() => {
+      console.log('等待 30 秒后，再执行下一个脚本');
+      run();
+    }, 30000);
 	});
 }
 
