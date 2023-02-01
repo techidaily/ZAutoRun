@@ -3,6 +3,7 @@ import _ from 'lodash';
 import fs from 'node:fs';
 import { join } from 'node:path';
 import {
+	getNowTime,
 	checkVisitYoutube,
 	clickOneAds,
 	getChromeUserAgent,
@@ -190,7 +191,7 @@ async function runUIActionForSite(
 	// 当整体操作耗时小于10分钟时，执行随机操作
 	while (lastRunFinishedTime - startTime < totalTime) {
 		console.log(
-			`正在执行UI中 .... ${actionSpec}已耗时：${(lastRunFinishedTime - startTime) / 1000 / 60} 分钟`
+			`正在执行UI中 .... ${actionSpec}已耗时：${Math.floor((lastRunFinishedTime - startTime) / 1000 / 60)} 分钟`
 		);
 
 		// 声明最大的随机间隔秒数
@@ -332,7 +333,7 @@ async function runUIActionForSite(
 		}
 	}
 
-	console.log(`${actionSpec}结束时间：${new Date().getTime()}`);
+	console.log(`${actionSpec}结束时间：${getNowTime()}`);
 
 	// 静默等待5秒
 	await page.waitForTimeout(1000 * 10);

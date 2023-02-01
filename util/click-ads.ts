@@ -28,8 +28,8 @@ export async function clickOneAds(visibleFrameList: any[]) {
 			}
 
 			// 根据数组长度和当前时间戳，编写一个随机选择一个数组元素的算法
-			const randomIndex = new Date().getTime() % adElementList.length;
-			const adElement = adElementList[randomIndex];
+			const adElement = _.sample(_.shuffle(adElementList));
+			const randomIndex = adElementList.indexOf(adElement);
 			console.log(`随机选择的广告元素Index是: ${randomIndex}`);
 
 			// 点击该广告元素
