@@ -52,4 +52,9 @@ test.describe('debug', () => {
 	});
 });
 
+test.describe('csv', () => {
+	// 测试读取 csv 文件，然后转换为数组
+	test.skip('read csv', async () => {  });
+})
+
 
