@@ -29,6 +29,8 @@ const commonUseOptions = {
 // 打印常用的配置信息
 console.log('commonUseOptions: ', commonUseOptions);
 
+const proxyServer = process.env?.TEST_ENV ?? `http://127.0.0.1:20172`;
+
 test.describe.configure({ mode: 'serial', timeout: 60 * 1000 * 60 });
 
 test.describe('使用代理IP访问站点', () => {
@@ -45,7 +47,7 @@ test.describe('使用代理IP访问站点', () => {
 
 			const context = await browser.newContext({
 				proxy: {
-					server: `http://127.0.0.1:20172`
+					server: proxyServer
 				},
 				...commonUseOptions
 			});
@@ -84,7 +86,7 @@ test.describe('使用代理IP访问站点', () => {
 
 			const context = await browser.newContext({
 				proxy: {
-					server: `http://127.0.0.1:20172`
+					server: proxyServer
 				},
 				...commonUseOptions
 			});
@@ -123,7 +125,7 @@ test.describe('使用代理IP访问站点', () => {
 
 			const context = await browser.newContext({
 				proxy: {
-					server: `http://127.0.0.1:20172`
+					server: proxyServer
 				},
 				...commonUseOptions
 			});
@@ -131,7 +133,7 @@ test.describe('使用代理IP访问站点', () => {
 			const page = await context.newPage();
 			await page.setViewportSize(viewPortSize);
 
-			const url = getOneSiteUrl();
+			const url = getOnePostUrl();
 			expect(url).toBeTruthy();
 
 			console.log(`使用代理IP访问：${url}`);
@@ -157,12 +159,34 @@ test.describe('使用代理IP访问站点', () => {
 	});
 });
 
-function getOneSiteUrl() {
+function getOnePostUrl() {
 	// 读取网址列表
-	const siteList = fs.readFileSync(join(__dirname, 'data/site.txt'), 'utf8').split('\n');
+	const siteList = fs.readFileSync(join(__dirname, 'data/posts.txt'), 'utf8').split('\n');
 
-	// 随机获取一个网址
-	const site = siteList[Math.floor(Math.random() * siteList.length)];
+	const configFile = join(__dirname, 'data/config.cache');
+
+	// 从配置文件data/config.cache,读取访问的网址索引，如果没有该文件就创建
+	// 判断文件是否存在，不存在，就创建
+	if (!fs.existsSync(configFile)) {
+		fs.writeFileSync(configFile, JSON.stringify({
+			postIndex: 0,
+			siteIndex: 0,
+		}));
+	}
+
+	// dump
+	const config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+	if (config.postIndex >= siteList.length - 1) {
+		config.postIndex = 0;
+	} else {
+		config.postIndex++;
+	}
+
+	// 保存配置文件
+	fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
+
+	// 读取网址
+	const site = siteList[config.postIndex];
 	return site;
 }
 
