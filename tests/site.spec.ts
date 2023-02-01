@@ -109,10 +109,7 @@ test.describe('使用代理IP访问站点', () => {
 			expect(url).toBeTruthy();
 
 			console.log(`使用代理IP访问：${url}`);
-			await page.goto(url, {
-				waitUntil: 'domcontentloaded',
-				timeout: 60 * 1000
-			});
+			await page.goto(url, {	timeout: 60 * 1000});
 			await page.waitForURL(url);
 			await expect(page).toHaveURL(url);
 
@@ -195,10 +192,10 @@ async function runUIActionForSite(
 		);
 
 		// 声明最大的随机间隔秒数
-		const maxRandomIntervalSecs = 5;
+		const maxRandomIntervalSecs = 3;
 
 		// 声明随机UI操作最大次数
-		const maxRandomActionCount = 15;
+		const maxRandomActionCount = 8;
 
 		// 随机执行UI操作
 		const actionCount = _.random(1, maxRandomActionCount);
