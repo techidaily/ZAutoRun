@@ -18,6 +18,10 @@ export async function clickOneAds(visibleFrameList: any[]) {
 				continue;
 			}
 
+			// 当前选择的frame所在的索引
+			const frameIndex = visibleFrameList.indexOf(frame);
+			console.log(`当前选择的广告frame所在的索引: ${frameIndex}`);
+
 			// 使用
 			// 查找iframe 中的内部 div 元素带有属性data-google-av-adk，该元素是广告元素
 			const adElementList = await frame.locator('div[data-google-av-adk]').all();

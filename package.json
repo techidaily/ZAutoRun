@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "auto": "node ./auto.js",
     "test": "playwright test",
     "test:site": "playwright test \"site.spec.ts\""
   },
