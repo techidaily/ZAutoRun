@@ -15,6 +15,7 @@ import {
 	getRandomBrowserResolution,
 	getVisibleFrames,
 
+	disableProxy,
 	proxyServer,
 	getProxySetting,
 	logUtil
@@ -58,8 +59,10 @@ test.describe('使用代理IP访问站点', () => {
 			await test.step('打开Google', async () => {
 				browser = await chromium.launch({
 					headless: disableHeadless,
-					proxy: {
-						server: 'per-context'
+					...disableProxy ? {} : {
+						proxy: {
+							server: 'per-context'
+						}
 					}
 				});
 
