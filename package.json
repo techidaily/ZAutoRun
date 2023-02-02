@@ -5,8 +5,10 @@
   "main": "auto.js",
   "scripts": {
     "auto": "node ./auto.js",
+    "auto-google": "node ./auto-google.js",
     "test": "playwright test",
-    "test:site": "playwright test \"site.spec.ts\""
+    "test:site": "playwright test \"site.spec.ts\"",
+    "test:google": "playwright test \"google-search.spec.ts\""
   },
   "keywords": [],
   "author": "",
