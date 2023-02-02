@@ -2,7 +2,7 @@ import { chromium, expect, firefox, test, webkit } from '@playwright/test';
 import _ from 'lodash';
 
 export interface IVisitYoutubeOptions {
-	proxyServer: string;
+	fnGetProxySetting: () => { [key: string]: any };
 	disableHeadless: boolean;
 	viewPortSize: { width: number; height: number };
 	commonUseOptions: { [key: string]: any };
@@ -20,9 +20,7 @@ export async function checkVisitYoutube(options: IVisitYoutubeOptions) {
 		});
 
 		const context = await browser.newContext({
-			proxy: {
-				server: options.proxyServer
-			},
+			...options.fnGetProxySetting(),
 			...options.commonUseOptions
 		});
 

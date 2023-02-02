@@ -10,6 +10,9 @@ import {
 	getRandomBestGeoInfo,
 	getRandomBrowserResolution,
 	getVisibleFrames,
+
+	proxyServer,
+	getProxySetting,
 	logUtil
 } from '../util';
 
@@ -31,8 +34,6 @@ const commonUseOptions = {
 // 打印常用的配置信息
 console.log('commonUseOptions: ', commonUseOptions);
 
-const proxyServer = process.env?.TEST_ENV ?? `http://127.0.0.1:20172`;
-
 test.describe.configure({ mode: 'serial', timeout: 60 * 1000 * 60 });
 
 test.describe('使用代理IP访问站点', () => {
@@ -48,9 +49,7 @@ test.describe('使用代理IP访问站点', () => {
 			});
 
 			const context = await browser.newContext({
-				proxy: {
-					server: proxyServer
-				},
+				...getProxySetting(),
 				...commonUseOptions
 			});
 
@@ -77,7 +76,7 @@ test.describe('使用代理IP访问站点', () => {
 
 	test('测试能访问Youtube', async () => {
 		await checkVisitYoutube({
-			proxyServer: proxyServer,
+			fnGetProxySetting: getProxySetting,
 			commonUseOptions: commonUseOptions,
 			disableHeadless: disableHeadless,
 			viewPortSize: viewPortSize
@@ -96,9 +95,7 @@ test.describe('使用代理IP访问站点', () => {
 			});
 
 			const context = await browser.newContext({
-				proxy: {
-					server: proxyServer
-				},
+				...getProxySetting(),
 				...commonUseOptions
 			});
 
