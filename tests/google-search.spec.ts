@@ -19,6 +19,7 @@ import {
 	proxyServer,
 	getLaunchProxySetting,
 	getProxySetting,
+	isGitHubAction,
 	logUtil
 } from '../util';
 
@@ -376,6 +377,9 @@ async function tryClickAdsFrame(page) {
 function getOneKeyword() {
 	// 读取网址列表
 	const keywordList = fs.readFileSync(join(__dirname, 'data/keywords.txt'), 'utf8').split('\n');
+	if (isGitHubAction) {
+		return _.sample(keywordList);
+	}
 
 	const configFile = join(__dirname, 'data/config.google.cache');
 

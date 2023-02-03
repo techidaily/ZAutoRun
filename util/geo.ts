@@ -49,3 +49,18 @@ export function getRandomBestGeoInfo() {
   const fns = [getRandomGeoInfoUS, getRandomGeoInfoUK, getRandomGeoInfoDE, getRandomGeoInfoCA];
   return fns[Math.floor(Math.random() * fns.length)]();
 }
+
+// 根据ip地址定位地理信息，并随机生成一个附近的地理信息
+export async function getGeoInfoByIp(ip: string) {
+  const url = `http://ip-api.com/json/${ip}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  const { lat, lon } = data;
+  const latitude = lat + Math.random() * 0.1 - 0.05;
+  const longitude = lon + Math.random() * 0.1 - 0.05;
+  return {
+    latitude,
+    longitude,
+    accuracy: 100,
+  };
+}

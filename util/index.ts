@@ -7,3 +7,4 @@ export * from './frames';
 export * from './check';
 export * from './date';
 export * from './proxy';
+export * from './github';

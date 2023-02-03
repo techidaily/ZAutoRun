@@ -14,6 +14,7 @@ import {
 	getLaunchProxySetting,
 	proxyServer,
 	getProxySetting,
+	isGitHubAction,
 	logUtil
 } from '../util';
 
@@ -127,8 +128,11 @@ function getOnePostUrl() {
 	// 读取网址列表
 	const siteList = fs.readFileSync(join(__dirname, 'data/posts.txt'), 'utf8').split('\n');
 
-	const configFile = join(__dirname, 'data/config.cache');
+	if (isGitHubAction) {
+		return _.sample(siteList);
+	}
 
+	const configFile = join(__dirname, 'data/config.cache');
 	// 从配置文件data/config.cache,读取访问的网址索引，如果没有该文件就创建
 	// 判断文件是否存在，不存在，就创建
 	if (!fs.existsSync(configFile)) {

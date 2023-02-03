@@ -1,0 +1,1 @@
+export const isGitHubAction = Boolean(process.env?.IS_GITHUB_ACTION);
