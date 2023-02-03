@@ -17,6 +17,7 @@ import {
 
 	disableProxy,
 	proxyServer,
+	getLaunchProxySetting,
 	getProxySetting,
 	logUtil
 } from '../util';
@@ -59,11 +60,7 @@ test.describe('使用代理IP访问站点', () => {
 			await test.step('打开Google', async () => {
 				browser = await chromium.launch({
 					headless: disableHeadless,
-					...disableProxy ? {} : {
-						proxy: {
-							server: 'per-context'
-						}
-					}
+					...getLaunchProxySetting(),
 				});
 
 				const context = await browser.newContext({

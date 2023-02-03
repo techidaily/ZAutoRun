@@ -12,3 +12,15 @@ export const getProxySetting = () => {
 		}
 	};
 }
+
+export const getLaunchProxySetting = () => {
+  if (disableProxy) {
+    return {};
+  }
+
+  return {
+    proxy: {
+      server: 'per-context'
+    }
+  };
+}

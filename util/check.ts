@@ -1,6 +1,6 @@
 import { chromium, expect, firefox, test, webkit } from '@playwright/test';
 import _ from 'lodash';
-import { disableProxy } from "./proxy";
+import { getLaunchProxySetting } from "./proxy";
 
 export interface IVisitYoutubeOptions {
 	fnGetProxySetting: () => { [key: string]: any };
@@ -15,11 +15,7 @@ export async function checkVisitYoutube(options: IVisitYoutubeOptions) {
 	try {
 		browser = await chromium.launch({
 			headless: options.disableHeadless,
-			...disableProxy ? {} : {
-				proxy: {
-					server: 'per-context'
-				}
-			}
+			...getLaunchProxySetting(),
 		});
 
 		const context = await browser.newContext({

@@ -11,7 +11,7 @@ import {
 	getRandomBrowserResolution,
 	getVisibleFrames,
 
-	disableProxy,
+	getLaunchProxySetting,
 	proxyServer,
 	getProxySetting,
 	logUtil
@@ -44,11 +44,7 @@ test.describe('使用代理IP访问站点', () => {
 		try {
 			browser = await chromium.launch({
 				headless: disableHeadless,
-				...disableProxy ? {} : {
-					proxy: {
-						server: 'per-context'
-					}
-				}
+				...getLaunchProxySetting(),
 			});
 
 			const context = await browser.newContext({
@@ -92,11 +88,7 @@ test.describe('使用代理IP访问站点', () => {
 		try {
 			browser = await chromium.launch({
 				headless: disableHeadless,
-				...disableProxy ? {} : {
-					proxy: {
-						server: 'per-context'
-					}
-				}
+				...getLaunchProxySetting(),
 			});
 
 			const context = await browser.newContext({
