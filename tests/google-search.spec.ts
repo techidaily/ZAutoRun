@@ -57,6 +57,7 @@ test.describe('使用代理IP访问站点', () => {
 	test('测试通过Google搜索进入站点页面', async () => {
 		let browser;
 		let page;
+		let hasGetNewKeyword = false;
 		try {
 			await test.step('打开Google', async () => {
 				browser = await chromium.launch({
@@ -76,6 +77,7 @@ test.describe('使用代理IP访问站点', () => {
 		   });
 			await test.step('搜索关键字', async () => {
 				const keyword = getOneKeyword();
+				hasGetNewKeyword = true;
 				await page.fill('input[name="q"]', keyword);
 				await page.click('input[type="submit"]');
 				await page.waitForTimeout(1000 * 60);
@@ -92,6 +94,7 @@ test.describe('使用代理IP访问站点', () => {
 			});
 
 		} catch (error) {
+			hasGetNewKeyword && failResetDataCache();
 			throw error;
 		} finally {
 			if (browser) {
@@ -381,6 +384,30 @@ function getOneKeyword() {
 		return _.sample(keywordList);
 	}
 
+	const { config, configFile } = readDataCache();
+	if (config.keywordIndex >= keywordList.length - 1) {
+		config.keywordIndex = 0;
+	} else {
+		config.keywordIndex++;
+	}
+
+	// 保存配置文件
+	fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
+
+	// 读取网址
+	const word = keywordList[config.keywordIndex];
+	return word;
+}
+
+function failResetDataCache() {
+	const { config, configFile } = readDataCache();
+	config.keywordIndex -= 1;
+
+	// 保存配置文件
+	fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
+}
+
+function readDataCache() {
 	const configFile = join(__dirname, 'data/config.google.cache');
 
 	// 从配置文件data/config.cache,读取访问的网址索引，如果没有该文件就创建
@@ -396,16 +423,5 @@ function getOneKeyword() {
 
 	// dump
 	const config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
-	if (config.keywordIndex >= keywordList.length - 1) {
-		config.keywordIndex = 0;
-	} else {
-		config.keywordIndex++;
-	}
-
-	// 保存配置文件
-	fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
-
-	// 读取网址
-	const word = keywordList[config.keywordIndex];
-	return word;
+	return { config, configFile };
 }

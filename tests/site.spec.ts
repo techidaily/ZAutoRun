@@ -86,6 +86,7 @@ test.describe('使用代理IP访问站点', () => {
 	test('执行访问官网网址', async () => {
 		let browserSuccess = false;
 		let browser;
+		let hasGetNewPostUrl = false;
 		try {
 			browser = await chromium.launch({
 				headless: disableHeadless,
@@ -101,6 +102,7 @@ test.describe('使用代理IP访问站点', () => {
 			await page.setViewportSize(viewPortSize);
 
 			const url = getOnePostUrl();
+			hasGetNewPostUrl = true;
 			expect(url).toBeTruthy();
 
 			console.log(`使用代理IP访问：${url}`);
@@ -114,6 +116,7 @@ test.describe('使用代理IP访问站点', () => {
 
 			browserSuccess = true;
 		} catch (error) {
+			hasGetNewPostUrl && failResetDataCache();
 			console.log(error);
 		} finally {
 			await browser.close();
@@ -132,6 +135,30 @@ function getOnePostUrl() {
 		return _.sample(siteList);
 	}
 
+	const { config, configFile } = readDataCache();
+	if (config.postIndex >= siteList.length - 1) {
+		config.postIndex = 0;
+	} else {
+		config.postIndex++;
+	}
+
+	// 保存配置文件
+	fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
+
+	// 读取网址
+	const site = siteList[config.postIndex];
+	return site;
+}
+
+function failResetDataCache() {
+	const { config, configFile } = readDataCache();
+	config.postIndex -= 1;
+
+	// 保存配置文件
+	fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
+}
+
+function readDataCache() {
 	const configFile = join(__dirname, 'data/config.cache');
 	// 从配置文件data/config.cache,读取访问的网址索引，如果没有该文件就创建
 	// 判断文件是否存在，不存在，就创建
@@ -147,18 +174,7 @@ function getOnePostUrl() {
 
 	// dump
 	const config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
-	if (config.postIndex >= siteList.length - 1) {
-		config.postIndex = 0;
-	} else {
-		config.postIndex++;
-	}
-
-	// 保存配置文件
-	fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
-
-	// 读取网址
-	const site = siteList[config.postIndex];
-	return site;
+	return { config, configFile };
 }
 
 async function runUIActionForSite(
